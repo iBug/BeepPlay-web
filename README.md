@@ -1,4 +1,4 @@
-# BeepPlay in React
+# BeepPlay Web
 
 This is a rework of my [original BeepPlay](https://github.com/iBug/CGadgets/tree/master/BeepPlay). Now created with React and works directly from your browser!
 

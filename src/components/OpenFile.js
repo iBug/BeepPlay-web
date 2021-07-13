@@ -37,7 +37,7 @@ export default class LoadFile extends Component {
         continue;
       }
       const [pitch, octave, tempo] = line.split(/\s+/);
-      const level = parseInt(pitch) + parseInt(octave) * 12;
+      const level = parseInt(pitch) + parseInt(octave) * 12 + 12;
       sheet.notes.push({ level: level, tempo: parseFloat(tempo) });
     }
     sheet.length = sheet.notes.reduce((sum, note) => sum + note.tempo, 0);

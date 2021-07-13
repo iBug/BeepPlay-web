@@ -85,7 +85,7 @@ export default class Player extends Component {
       return 0;
     }
     const referenceFrequency = 440; // A4
-    const referenceNote = 57; // A4 = 9 + 4 * 12
+    const referenceNote = 69; // A4 = 9 + (4 + 1) * 12
     const relativeLevel = level - referenceNote;
     const frequency = Math.pow(2, relativeLevel / 12) * referenceFrequency;
     return frequency;

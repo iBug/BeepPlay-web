@@ -5,7 +5,7 @@ import Player from "./components/Player";
 
 export default class App extends Component {
   state = {
-    sheet: null,
+    sheet: { notes: []},
   };
 
   onChangeFile(sheet) {

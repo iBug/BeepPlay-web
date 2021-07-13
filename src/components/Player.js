@@ -9,6 +9,9 @@ export default class Player extends Component {
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     this.gainNode = this.audioContext.createGain();
     this.sheet = this.props.sheet;
+  }
+
+  componentDidMount() {
     this.setGain(0.5);
   }
 

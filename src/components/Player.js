@@ -6,6 +6,7 @@ export default class Player extends Component {
     this.state = {
       gain: 0.5,
       noteIndex: -1,
+      waveType: "sine",
     };
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     this.gainNode = this.audioContext.createGain();
@@ -21,6 +22,10 @@ export default class Player extends Component {
   playMelody() {
     if (this.oscillator) {
       this.stop();
+    }
+
+    if (!this.props.sheet) {
+      return;
     }
 
     this.setState({ noteIndex: -1 });
@@ -45,7 +50,7 @@ export default class Player extends Component {
     const oscillator = audioCtx.createOscillator();
     this.oscillator = oscillator;
 
-    oscillator.type = "sine";
+    oscillator.type = this.state.waveType;
     oscillator.frequency.value = frequency;
     oscillator.connect(this.gainNode).connect(audioCtx.destination);
     oscillator.onended = callback;
@@ -107,16 +112,18 @@ export default class Player extends Component {
         </div>
         <div className="row">
           <div className="col-auto">
+            <label className="form-label d-block">Control</label>
             <button className="btn btn-primary" onClick={() => this.playMelody()}>
               <i className="fas fa-play"></i> Play
             </button>
-          </div>
-          <div className="col-auto">
-            <button className="btn btn-danger" onClick={() => this.stop()}>
+            <button className="btn btn-danger ms-2" onClick={() => this.stop()}>
               <i className="fas fa-stop"></i> Stop
             </button>
           </div>
           <div className="col">
+            <label htmlFor="volume" className="form-label">
+              {"Volume: " + parseFloat(this.state.gain).toFixed(2)}
+            </label>
             <input
               type="range"
               className="form-range"
@@ -126,14 +133,27 @@ export default class Player extends Component {
               }}
               value={this.state.gain}
               min={0}
-              max={2}
+              max={1}
               step={0.01}
             />
           </div>
           <div className="col-auto">
-            <label htmlFor="volume" className="form-label">
-              {"Volume: " + parseFloat(this.state.gain).toFixed(2)}
+            <label htmlFor="waveType" className="form-label">
+              Type
             </label>
+            <select
+              className="form-select"
+              onChange={(e) => {
+                this.setState({ waveType: e.target.value });
+              }}
+            >
+              <option value="sine" selected>
+                Sine (Default)
+              </option>
+              <option value="square">Square</option>
+              <option value="sawtooth">Sawtooth</option>
+              <option value="triangle">Triangle</option>
+            </select>
           </div>
         </div>
       </div>

@@ -40,6 +40,8 @@ export default class LoadFile extends Component {
       const level = parseInt(pitch) + parseInt(octave) * 12;
       sheet.notes.push({ level: level, tempo: parseFloat(tempo) });
     }
+    sheet.length = sheet.notes.reduce((sum, note) => sum + note.tempo, 0);
+    console.log(sheet.length);
     return sheet;
   }
 
@@ -56,7 +58,7 @@ export default class LoadFile extends Component {
             />
           </span>
           <button className="btn btn-primary ms-2" onClick={() => this.loadFile()}>
-            Load
+            <i className="fas fa-folder-open"></i> Load
           </button>
         </div>
       </div>

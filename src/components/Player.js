@@ -5,10 +5,12 @@ export default class Player extends Component {
     super(props);
     this.state = {
       gain: 0.5,
+      noteIndex: -1,
     };
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     this.gainNode = this.audioContext.createGain();
-    this.sheet = this.props.sheet;
+    const defaultSheet = { notes: [] };
+    this.sheet = this.props.sheet || defaultSheet;
     this.setGain(this.state.gain);
   }
 
@@ -21,20 +23,19 @@ export default class Player extends Component {
       this.stop();
     }
 
-    this.noteIndex = -1;
+    this.setState({ noteIndex: -1 });
     this.playNextNote();
   }
 
   playNextNote() {
-    this.noteIndex++;
-    if (this.noteIndex >= this.sheet.notes.length) {
+    const noteIndex = this.state.noteIndex + 1;
+    this.setState({ noteIndex: noteIndex });
+    if (noteIndex >= this.sheet.notes.length) {
       this.stop();
     } else {
-      const note = this.sheet.notes[this.noteIndex];
-      this.playNote(
-        this.toFrequency(note.level + this.sheet.offset),
-        this.toDuration(note.tempo, this.sheet.bpm),
-        () => this.playNextNote()
+      const note = this.sheet.notes[noteIndex];
+      this.playNote(this.toFrequency(note.level + this.sheet.offset), this.toDuration(note.tempo, this.sheet.bpm), () =>
+        this.playNextNote()
       );
     }
   }
@@ -64,6 +65,7 @@ export default class Player extends Component {
     this.oscillator.onended = null;
     this.oscillator.stop();
     this.oscillator = null;
+    this.setState({ noteIndex: -1 });
   }
 
   toFrequency(level) {
@@ -83,21 +85,57 @@ export default class Player extends Component {
 
   render() {
     return (
-      <div className="Player">
-        <button className="btn btn-primary" onClick={() => this.playMelody()}>Play</button>
-        <button className="btn btn-danger" onClick={() => this.stop()}>Stop</button>
-        <input
-          type="range"
-          id="volume"
-          onChange={(e) => {
-            this.setGain(e.target.value);
-          }}
-          value={this.state.gain}
-          min={0}
-          max={2}
-          step={0.01}
-        />
-        <label htmlFor="volume" className="form-label">{"Volume: " + parseFloat(this.state.gain).toFixed(2)}</label>
+      <div className="Player container">
+        <div className="row mb-2">
+          <div className="col">
+            <input
+              type="range"
+              className="form-range"
+              name="progressBar"
+              readOnly="readonly"
+              value={1 + this.state.noteIndex}
+              min="0"
+              max={this.sheet.notes.length}
+              step={1}
+            />
+          </div>
+          <div className="col-auto">
+            <label htmlFor="progressBar" className="form-label">
+              {"Notes: " + (this.state.noteIndex + 1) + " / " + this.sheet.notes.length}
+            </label>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-auto">
+            <button className="btn btn-primary" onClick={() => this.playMelody()}>
+              <i className="fas fa-play"></i> Play
+            </button>
+          </div>
+          <div className="col-auto">
+            <button className="btn btn-danger" onClick={() => this.stop()}>
+              <i className="fas fa-stop"></i> Stop
+            </button>
+          </div>
+          <div className="col">
+            <input
+              type="range"
+              className="form-range"
+              name="volume"
+              onChange={(e) => {
+                this.setGain(e.target.value);
+              }}
+              value={this.state.gain}
+              min={0}
+              max={2}
+              step={0.01}
+            />
+          </div>
+          <div className="col-auto">
+            <label htmlFor="volume" className="form-label">
+              {"Volume: " + parseFloat(this.state.gain).toFixed(2)}
+            </label>
+          </div>
+        </div>
       </div>
     );
   }

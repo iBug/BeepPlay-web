@@ -8,7 +8,7 @@ export default class LoadFile extends Component {
 
   loadFile() {
     const reader = new FileReader();
-    reader.onload = async (e) => {
+    reader.onloadend = async (e) => {
       const text = e.target.result;
       try {
         const sheet = this.parseSheet(text);

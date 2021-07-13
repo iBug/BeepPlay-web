@@ -46,9 +46,19 @@ export default class LoadFile extends Component {
   render() {
     return (
       <div className="LoadFile">
-        <label htmlFor="file"></label>
-        <input type="file" name="file" onChange={(e) => this.setState({ filename: e.target.files[0] })}></input>
-        <button className="btn btn-primary" onClick={() => this.loadFile()}>Load</button>
+        <div className="mb-3 d-flex">
+          <span className="flex-grow-1">
+            <input
+              type="file"
+              className="form-control"
+              name="file"
+              onChange={(e) => this.setState({ filename: e.target.files[0] })}
+            />
+          </span>
+          <button className="btn btn-primary ms-2" onClick={() => this.loadFile()}>
+            Load
+          </button>
+        </div>
       </div>
     );
   }

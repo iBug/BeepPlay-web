@@ -4,15 +4,12 @@ export default class Player extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      gain: 0,
+      gain: 0.5,
     };
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     this.gainNode = this.audioContext.createGain();
     this.sheet = this.props.sheet;
-  }
-
-  componentDidMount() {
-    this.setGain(0.5);
+    this.setGain(this.state.gain);
   }
 
   componentDidUpdate() {
@@ -86,7 +83,7 @@ export default class Player extends Component {
 
   render() {
     return (
-      <div className="player">
+      <div className="Player">
         <button className="btn btn-primary" onClick={() => this.playMelody()}>Play</button>
         <button className="btn btn-danger" onClick={() => this.stop()}>Stop</button>
         <input
@@ -100,6 +97,7 @@ export default class Player extends Component {
           max={2}
           step={0.01}
         />
+        <label htmlFor="volume" className="form-label">{"Volume: " + parseFloat(this.state.gain).toFixed(2)}</label>
       </div>
     );
   }

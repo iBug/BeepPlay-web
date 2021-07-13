@@ -1,0 +1,33 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - run: yarn install -D
+    - run: yarn build
+    - name: Deploy to GitHub Pages
+      run: |
+        CINFO="$(git log -1 --pretty="%an: [%h] %s")"
+        git clone --depth=1 --branch=gh-pages --single-branch --no-checkout \
+          "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" gittemp
+        mv gittemp/.git build/.git && rmdir gittemp/
+        pushd build/ &>/dev/null
+        echo -n beep.ibugone.com > CNAME
+        git add -A
+        git -c user.name=GitHub -c user.email=noreply@github.com commit \
+          -m "Auto deploy from GitHub Actions build ${GITHUB_RUN_NUMBER}" \
+          -m "$CINFO"
+        git push
+        popd &>/dev/null

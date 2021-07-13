@@ -63,6 +63,13 @@ export default class Player extends Component {
     this.gainNode.gain.value = gain;
   }
 
+  setProgress(progress) {
+    if (this.oscillator) {
+      this.oscillator.stop();
+    }
+    this.setState({ noteIndex: progress - 1 });
+  }
+
   setWaveType(waveType) {
     this.setState({ waveType: waveType });
     if (this.oscillator) {
@@ -104,9 +111,9 @@ export default class Player extends Component {
               type="range"
               className="form-range"
               name="progressBar"
-              readOnly="readonly"
               value={1 + this.state.noteIndex}
-              min="0"
+              onChange={(e) => this.setProgress(e.target.value)}
+              min={0}
               max={this.sheet.notes.length}
               step={1}
             />

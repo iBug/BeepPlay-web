@@ -63,6 +63,13 @@ export default class Player extends Component {
     this.gainNode.gain.value = gain;
   }
 
+  setWaveType(waveType) {
+    this.setState({ waveType: waveType });
+    if (this.oscillator) {
+      this.oscillator.type = waveType;
+    }
+  }
+
   stop() {
     if (!this.oscillator) {
       return;
@@ -141,15 +148,8 @@ export default class Player extends Component {
             <label htmlFor="waveType" className="form-label">
               Type
             </label>
-            <select
-              className="form-select"
-              onChange={(e) => {
-                this.setState({ waveType: e.target.value });
-              }}
-            >
-              <option value="sine" selected>
-                Sine (Default)
-              </option>
+            <select className="form-select" onChange={(e) => this.setWaveType(e.target.value)} defaultValue="sine">
+              <option value="sine">Sine (Default)</option>
               <option value="square">Square</option>
               <option value="sawtooth">Sawtooth</option>
               <option value="triangle">Triangle</option>

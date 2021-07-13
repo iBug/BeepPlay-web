@@ -1,11 +1,6 @@
 import { Component } from "react";
 
 export default class LoadFile extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { filename: null };
-  }
-
   loadFile() {
     const reader = new FileReader();
     reader.onloadend = async (e) => {
@@ -18,7 +13,7 @@ export default class LoadFile extends Component {
         console.error(err);
       }
     };
-    reader.readAsText(this.state.filename, "utf-8");
+    reader.readAsText(this.state.file, "utf-8");
   }
 
   parseSheet(text) {
@@ -54,7 +49,7 @@ export default class LoadFile extends Component {
               type="file"
               className="form-control"
               name="file"
-              onChange={(e) => this.setState({ filename: e.target.files[0] })}
+              onChange={(e) => this.setState({ file: e.target.files[0] })}
             />
           </span>
           <button className="btn btn-primary ms-2" onClick={() => this.loadFile()}>

@@ -87,8 +87,8 @@ export default class Player extends Component {
   render() {
     return (
       <div className="player">
-        <button onClick={() => this.playMelody()}>Play</button>
-        <button onClick={() => this.stop()}>Stop</button>
+        <button className="btn btn-primary" onClick={() => this.playMelody()}>Play</button>
+        <button className="btn btn-danger" onClick={() => this.stop()}>Stop</button>
         <input
           type="range"
           id="volume"
@@ -100,7 +100,6 @@ export default class Player extends Component {
           max={2}
           step={0.01}
         />
-        <textarea />
       </div>
     );
   }

@@ -48,7 +48,7 @@ export default class LoadFile extends Component {
       <div className="LoadFile">
         <label htmlFor="file"></label>
         <input type="file" name="file" onChange={(e) => this.setState({ filename: e.target.files[0] })}></input>
-        <button onClick={() => this.loadFile()}>Load</button>
+        <button className="btn btn-primary" onClick={() => this.loadFile()}>Load</button>
       </div>
     );
   }

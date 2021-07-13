@@ -6,7 +6,7 @@ import Player from "./components/Player";
 export default class App extends Component {
   state = {
     sheet: null,
-  }
+  };
 
   onChangeFile(sheet) {
     this.setState({ sheet: sheet });
@@ -14,11 +14,12 @@ export default class App extends Component {
 
   render() {
     return (
-      <div className="App">
-        <header className="App-header"></header>
-        <main>
-          <OpenFile onChangeFile={this.onChangeFile.bind(this)} />
-          <Player sheet={this.state.sheet} />
+      <div className="App container">
+        <main className="card mb-3">
+          <div className="card-body">
+            <OpenFile onChangeFile={this.onChangeFile.bind(this)} />
+            <Player sheet={this.state.sheet} />
+          </div>
         </main>
       </div>
     );

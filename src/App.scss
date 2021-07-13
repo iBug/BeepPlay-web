@@ -1,3 +1,24 @@
+body {
+  background-color: #eee;
+
+  nav, footer {
+    background: #f8fcff !important;
+  }
+
+  footer a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+#root {
+  flex: 1 0 auto;
+  width: 100vw;
+}
+
 .App {
   text-align: center;
 }

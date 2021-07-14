@@ -64,10 +64,10 @@ export default class Player extends Component {
   }
 
   setProgress(progress) {
+    this.setState({ noteIndex: progress - 1 });
     if (this.oscillator) {
       this.oscillator.stop();
     }
-    this.setState({ noteIndex: progress - 1 });
   }
 
   setWaveType(waveType) {

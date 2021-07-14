@@ -4,7 +4,7 @@ export default class Player extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      gain: 0.5,
+      gain: 0.3,
       noteIndex: -1,
       waveType: "sine",
     };

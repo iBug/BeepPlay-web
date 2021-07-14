@@ -9,8 +9,9 @@ export default class Player extends Component {
       waveType: "sine",
     };
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    this.auxOscillators = [];
     this.gainNode = this.audioContext.createGain();
-    const defaultSheet = { notes: [] };
+    const defaultSheet = { bpm: 120, offset: 0, notes: [] };
     this.sheet = this.props.sheet || defaultSheet;
     this.setGain(this.state.gain);
   }
@@ -39,13 +40,12 @@ export default class Player extends Component {
       this.stop();
     } else {
       const note = this.sheet.notes[noteIndex];
-      this.playNote(this.toFrequency(note.level + this.sheet.offset), this.toDuration(note.tempo, this.sheet.bpm), () =>
-        this.playNextNote()
-      );
+      const aux = note.aux.map((n) => [this.toFrequency(n.level), this.toDuration(n.tempo), this.toDuration(n.offset)]);
+      this.playNote(this.toFrequency(note.level), this.toDuration(note.tempo), () => this.playNextNote(), aux || []);
     }
   }
 
-  playNote(frequency, duration, callback) {
+  playNote(frequency, duration, callback, aux) {
     const audioCtx = this.audioContext;
     const oscillator = audioCtx.createOscillator();
     this.oscillator = oscillator;
@@ -54,6 +54,27 @@ export default class Player extends Component {
     oscillator.frequency.value = frequency;
     oscillator.connect(this.gainNode).connect(audioCtx.destination);
     oscillator.onended = callback;
+    if (aux?.length) {
+      const auxOscillators = [];
+      aux.forEach(([frequency, duration, offset]) => {
+        const o = audioCtx.createOscillator();
+        o.type = this.state.waveType;
+        o.frequency.value = frequency;
+        o.connect(this.gainNode).connect(audioCtx.destination);
+        o.duration = duration;
+        o.offset = offset;
+        auxOscillators.push(o);
+      });
+      auxOscillators.forEach(o => {
+        if (o.offset) {
+          o.start(audioCtx.currentTime + o.offset);
+          o.stop(audioCtx.currentTime + o.offset + o.duration)
+        } else {
+          o.start();
+          o.stop(audioCtx.currentTime + o.duration)
+        }
+      });
+    }
     oscillator.start();
     oscillator.stop(audioCtx.currentTime + duration);
   }
@@ -91,6 +112,7 @@ export default class Player extends Component {
     if (level === 0) {
       return 0;
     }
+    level += this.sheet.offset;
     const referenceFrequency = 440; // A4
     const referenceNote = 69; // A4 = 9 + (4 + 1) * 12
     const relativeLevel = level - referenceNote;
@@ -98,8 +120,9 @@ export default class Player extends Component {
     return frequency;
   }
 
-  toDuration(tempo, bpm) {
-    return (tempo * 60) / (bpm * 16);
+  toDuration(tempo) {
+    if (!tempo) return 0;
+    return (tempo * 60) / (this.sheet.bpm * 16);
   }
 
   render() {

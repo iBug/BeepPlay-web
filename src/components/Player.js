@@ -3,21 +3,23 @@ import { Component } from "react";
 export default class Player extends Component {
   constructor(props) {
     super(props);
+    const defaultSheet = { bpm: 120, offset: 0, notes: [] };
     this.state = {
       gain: 0.3,
       noteIndex: -1,
+      sheet: this.props.sheet || defaultSheet,
       waveType: "sine",
     };
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     this.auxOscillators = [];
     this.gainNode = this.audioContext.createGain();
-    const defaultSheet = { bpm: 120, offset: 0, notes: [] };
-    this.sheet = this.props.sheet || defaultSheet;
     this.setGain(this.state.gain);
   }
 
-  componentDidUpdate() {
-    this.sheet = this.props.sheet;
+  componentDidUpdate(prevProps) {
+    if (prevProps.sheet !== this.props.sheet) {
+      this.setState({ sheet: this.props.sheet });
+    }
   }
 
   playMelody() {
@@ -35,11 +37,12 @@ export default class Player extends Component {
 
   playNextNote() {
     const noteIndex = this.state.noteIndex + 1;
+    const sheet = this.state.sheet;
     this.setState({ noteIndex: noteIndex });
-    if (noteIndex >= this.sheet.notes.length) {
+    if (noteIndex >= sheet.notes.length) {
       this.stop();
     } else {
-      const note = this.sheet.notes[noteIndex];
+      const note = sheet.notes[noteIndex];
       const aux = note.aux.map((n) => [this.toFrequency(n.level), this.toDuration(n.tempo), this.toDuration(n.offset)]);
       this.playNote(this.toFrequency(note.level), this.toDuration(note.tempo), () => this.playNextNote(), aux || []);
     }
@@ -65,13 +68,13 @@ export default class Player extends Component {
         o.offset = offset;
         auxOscillators.push(o);
       });
-      auxOscillators.forEach(o => {
+      auxOscillators.forEach((o) => {
         if (o.offset) {
           o.start(audioCtx.currentTime + o.offset);
-          o.stop(audioCtx.currentTime + o.offset + o.duration)
+          o.stop(audioCtx.currentTime + o.offset + o.duration);
         } else {
           o.start();
-          o.stop(audioCtx.currentTime + o.duration)
+          o.stop(audioCtx.currentTime + o.duration);
         }
       });
     }
@@ -112,7 +115,7 @@ export default class Player extends Component {
     if (level === 0) {
       return 0;
     }
-    level += this.sheet.offset;
+    level += this.state.sheet.offset;
     const referenceFrequency = 440; // A4
     const referenceNote = 69; // A4 = 9 + (4 + 1) * 12
     const relativeLevel = level - referenceNote;
@@ -122,7 +125,7 @@ export default class Player extends Component {
 
   toDuration(tempo) {
     if (!tempo) return 0;
-    return (tempo * 60) / (this.sheet.bpm * 16);
+    return (tempo * 60) / (this.state.sheet.bpm * 16);
   }
 
   render() {
@@ -137,13 +140,13 @@ export default class Player extends Component {
               value={1 + this.state.noteIndex}
               onChange={(e) => this.setProgress(e.target.value)}
               min={0}
-              max={this.sheet.notes.length}
+              max={this.state.sheet.notes.length}
               step={1}
             />
           </div>
           <div className="col-auto">
             <label htmlFor="progressBar" className="form-label">
-              {"Notes: " + (this.state.noteIndex + 1) + " / " + this.sheet.notes.length}
+              {"Notes: " + (this.state.noteIndex + 1) + " / " + this.state.sheet.notes.length}
             </label>
           </div>
         </div>

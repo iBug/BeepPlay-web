@@ -13,7 +13,6 @@ export default class LoadFile extends Component {
     await fetch("./examples/" + example)
       .then((response) => response.blob())
       .then((data) => {
-        console.log(data);
         this.setState({ file: data });
         this.loadFile();
       });
@@ -22,7 +21,10 @@ export default class LoadFile extends Component {
   async loadExamples() {
     await fetch("./examples/index.json")
       .then((response) => response.json())
-      .then((data) => this.setState({ example: data[0], examples: data }));
+      .then((data) => {
+        data = data.filter(s => !s.endsWith(".json"));
+        this.setState({ example: data[0], examples: data });
+      });
   }
 
   loadFile() {

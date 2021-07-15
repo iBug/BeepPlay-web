@@ -18,7 +18,7 @@ export default class Player extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.sheet !== this.props.sheet) {
-      this.setState({ sheet: this.props.sheet });
+      this.setState({ noteIndex: -1, sheet: this.props.sheet });
       this.stop();
     }
   }
@@ -39,14 +39,14 @@ export default class Player extends Component {
   playNextNote() {
     const noteIndex = this.state.noteIndex + 1;
     const sheet = this.state.sheet;
-    this.setState({ noteIndex: noteIndex });
     if (noteIndex >= sheet.notes.length) {
       this.stop();
-    } else {
-      const note = sheet.notes[noteIndex];
-      const aux = note.aux.map((n) => [this.toFrequency(n.level), this.toDuration(n.tempo), this.toDuration(n.offset)]);
-      this.playNote(this.toFrequency(note.level), this.toDuration(note.tempo), () => this.playNextNote(), aux || []);
+      return;
     }
+    this.setState({ noteIndex: noteIndex });
+    const note = sheet.notes[noteIndex];
+    const aux = note.aux.map((n) => [this.toFrequency(n.level), this.toDuration(n.tempo), this.toDuration(n.offset)]);
+    this.playNote(this.toFrequency(note.level), this.toDuration(note.tempo), () => this.playNextNote(), aux || []);
   }
 
   playNote(frequency, duration, callback, aux) {

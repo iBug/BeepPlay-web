@@ -19,6 +19,7 @@ export default class Player extends Component {
   componentDidUpdate(prevProps) {
     if (prevProps.sheet !== this.props.sheet) {
       this.setState({ sheet: this.props.sheet });
+      this.stop();
     }
   }
 

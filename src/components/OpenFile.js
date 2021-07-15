@@ -82,10 +82,10 @@ export default class LoadFile extends Component {
       const [pitch, octave, tempo] = first.split(/\s+/);
       const level = parseInt(pitch) + parseInt(octave) * 12 + 12;
       const aux = more.map((s) => {
-        const [pitch, octave, tempo, off] = s.split(/\s+/);
+        const [pitch, octave, tempoA, off] = s.split(/\s+/);
         const level = parseInt(pitch) + parseInt(octave) * 12 + 12;
         const offset = off ? parseFloat(off) : undefined;
-        return { level: level, tempo: parseFloat(tempo), offset: offset };
+        return { level: level, tempo: parseFloat(tempoA || tempo), offset: offset };
       });
       sheet.notes.push({ level: level, tempo: parseFloat(tempo), aux: aux });
     }

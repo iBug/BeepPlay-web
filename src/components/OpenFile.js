@@ -127,7 +127,7 @@ export default class LoadFile extends Component {
           {options}
         </select>
       );
-      loadEnabled = true;
+      loadEnabled = options.length > 1;
     }
     return (
       <div className="LoadFile">

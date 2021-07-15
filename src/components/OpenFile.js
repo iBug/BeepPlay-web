@@ -1,6 +1,30 @@
 import { Component } from "react";
 
 export default class LoadFile extends Component {
+  state = {
+    mode: "file",
+    example: null,
+    examples: ["Loading ..."],
+    file: null,
+  };
+
+  async loadExample() {
+    const example = this.state.example;
+    await fetch("./examples/" + example)
+      .then((response) => response.blob())
+      .then((data) => {
+        console.log(data);
+        this.setState({ file: data });
+        this.loadFile();
+      });
+  }
+
+  async loadExamples() {
+    await fetch("./examples/index.json")
+      .then((response) => response.json())
+      .then((data) => this.setState({ example: data[0], examples: data }));
+  }
+
   loadFile() {
     const reader = new FileReader();
     reader.onloadend = async (e) => {
@@ -9,11 +33,32 @@ export default class LoadFile extends Component {
         const sheet = this.parseSheet(text);
         this.props.onChangeFile(sheet);
         console.log("Loaded sheet:", sheet);
+        if (this.fileInput.type === "file") this.fileInput.value = "";
+        this.setState({ file: null });
       } catch (err) {
         console.error(err);
       }
     };
     reader.readAsText(this.state.file, "utf-8");
+  }
+
+  onLoadFile() {
+    if (this.state.mode === "file") {
+      this.loadFile();
+    } else if (this.state.mode === "example") {
+      this.loadExample();
+    }
+  }
+
+  onModeChange(e) {
+    this.setMode(e.target.value);
+  }
+
+  setMode(mode) {
+    if (mode === "example" && !this.example) {
+      this.loadExamples();
+    }
+    this.setState({ mode: mode });
   }
 
   parseSheet(text) {
@@ -48,19 +93,73 @@ export default class LoadFile extends Component {
   }
 
   render() {
+    let inputElement = null,
+      loadIcon = null,
+      loadEnabled = true;
+    if (this.state.mode === "file") {
+      loadIcon = "folder-open";
+      inputElement = (
+        <input
+          ref={(ref) => (this.fileInput = ref)}
+          type="file"
+          className="form-control"
+          name="file"
+          onChange={(e) => this.setState({ file: e.target.files[0] })}
+        />
+      );
+      loadEnabled = !!this.state.file;
+    } else if (this.state.mode === "example") {
+      loadIcon = "download";
+      const options = this.state.examples.map((name) => (
+        <option key={name} value={name}>
+          {name}
+        </option>
+      ));
+      inputElement = (
+        <select
+          ref={(ref) => (this.fileInput = ref)}
+          className="form-select"
+          aria-label="Select an example"
+          onChange={(e) => this.setState({ example: e.target.value })}
+        >
+          {options}
+        </select>
+      );
+      loadEnabled = true;
+    }
     return (
       <div className="LoadFile">
-        <div className="mb-3 d-flex">
-          <span className="flex-grow-1">
-            <input
-              type="file"
-              className="form-control"
-              name="file"
-              onChange={(e) => this.setState({ file: e.target.files[0] })}
-            />
-          </span>
-          <button className="btn btn-primary ms-2" onClick={() => this.loadFile()}>
-            <i className="fas fa-folder-open"></i> Load
+        <div className="container mb-3 d-flex align-items-baseline">
+          <div className="col-auto" onChange={(e) => this.onModeChange(e)}>
+            <span className="form-check form-check-inline">
+              <input
+                className="form-check-input"
+                type="radio"
+                name="loadSource"
+                id="loadSourceFile"
+                value="file"
+                defaultChecked
+              />
+              <label className="form-check-label" htmlFor="loadSourceFile">
+                Local File
+              </label>
+            </span>
+            <span className="form-check form-check-inline">
+              <input
+                className="form-check-input"
+                type="radio"
+                name="loadSource"
+                id="loadSourceExample"
+                value="example"
+              />
+              <label className="form-check-label" htmlFor="loadSourceExample">
+                Examples
+              </label>
+            </span>
+          </div>
+          <span className="flex-grow-1">{inputElement}</span>
+          <button className="btn btn-primary ms-2" disabled={!loadEnabled} onClick={() => this.onLoadFile()}>
+            <i className={"fas fa-fw fa-" + loadIcon}></i> Load
           </button>
         </div>
       </div>

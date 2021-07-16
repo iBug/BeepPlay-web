@@ -20,7 +20,10 @@ jobs:
         path: '**/node_modules'
         key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
     - run: yarn install -D
-    - run: yarn build
+    - name: yarn build
+      run: |
+        export REACT_APP_SHA_LONG="$(git rev-parse HEAD)" REACT_APP_SHA="$(git log -1 --pretty=tformat:%h HEAD)"
+        yarn build
     - name: Extra patches
       run: |
         python -c 'import sys, os, json; json.dump(sorted(os.listdir("public/examples")), sys.stdout, sort_keys=True)' > build/examples/index.json

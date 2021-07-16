@@ -26,7 +26,7 @@ jobs:
         yarn build
     - name: Extra patches
       run: |
-        python -c 'import sys, os, json; json.dump(sorted(os.listdir("public/examples")), sys.stdout, sort_keys=True)' > build/examples/index.json
+        node scripts/genIndex.js
     - name: Deploy to GitHub Pages
       run: |
         CINFO="$(git log -1 --pretty="%an: [%h] %s")"

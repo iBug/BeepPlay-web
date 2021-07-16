@@ -3,7 +3,7 @@ import { Component } from "react";
 export default class LoadFile extends Component {
   state = {
     mode: "file",
-    example: null,
+    example: "Loading ...",
     examples: ["Loading ..."],
     file: null,
   };
@@ -22,8 +22,9 @@ export default class LoadFile extends Component {
     await fetch("./examples/index.json")
       .then((response) => response.json())
       .then((data) => {
-        data = data.filter((s) => !s.endsWith(".json"));
-        this.setState({ example: data[0], examples: data });
+        const defaultFile = data["default"];
+        const files = data.files.filter((s) => !s.endsWith(".json"));
+        this.setState({ example: defaultFile, examples: files });
       });
   }
 
@@ -121,6 +122,7 @@ export default class LoadFile extends Component {
         <select
           ref={(ref) => (this.fileInput = ref)}
           className="form-select"
+          value={this.state.example}
           aria-label="Select an example"
           onChange={(e) => this.setState({ example: e.target.value })}
         >

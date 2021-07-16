@@ -22,7 +22,7 @@ export default class LoadFile extends Component {
     await fetch("./examples/index.json")
       .then((response) => response.json())
       .then((data) => {
-        data = data.filter(s => !s.endsWith(".json"));
+        data = data.filter((s) => !s.endsWith(".json"));
         this.setState({ example: data[0], examples: data });
       });
   }
@@ -130,9 +130,9 @@ export default class LoadFile extends Component {
       loadEnabled = options.length > 1;
     }
     return (
-      <div className="LoadFile">
-        <div className="container mb-3 d-flex align-items-baseline">
-          <div className="col-auto" onChange={(e) => this.onModeChange(e)}>
+      <div className="LoadFile container mb-3">
+        <div className="row justify-content-between align-items-baseline">
+          <span className="col-12 col-md-auto" onChange={(e) => this.onModeChange(e)}>
             <span className="form-check form-check-inline">
               <input
                 className="form-check-input"
@@ -158,11 +158,13 @@ export default class LoadFile extends Component {
                 Examples
               </label>
             </span>
-          </div>
-          <span className="flex-grow-1">{inputElement}</span>
-          <button className="btn btn-primary ms-2" disabled={!loadEnabled} onClick={() => this.onLoadFile()}>
-            <i className={"fas fa-fw fa-" + loadIcon}></i> Load
-          </button>
+          </span>
+          <span className="col col-12 col-md-auto flex-grow-1 my-3 my-md-0">{inputElement}</span>
+          <span className="col-12 col-md-auto">
+            <button className="btn btn-primary" disabled={!loadEnabled} onClick={() => this.onLoadFile()}>
+              <i className={"fas fa-fw fa-" + loadIcon}></i> Load
+            </button>
+          </span>
         </div>
       </div>
     );

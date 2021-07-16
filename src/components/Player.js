@@ -161,7 +161,18 @@ export default class Player extends Component {
               <i className="fas fa-stop"></i> Stop
             </button>
           </div>
-          <div className="col">
+          <div className="col-auto">
+            <label htmlFor="waveType" className="form-label">
+              Type
+            </label>
+            <select className="form-select" onChange={(e) => this.setWaveType(e.target.value)} defaultValue="sine">
+              <option value="sine">Sine (Default)</option>
+              <option value="square">Square</option>
+              <option value="sawtooth">Sawtooth</option>
+              <option value="triangle">Triangle</option>
+            </select>
+          </div>
+          <div className="col-12 col-md-auto flex-grow-1">
             <label htmlFor="volume" className="form-label">
               {"Volume: " + parseFloat(this.state.gain).toFixed(2)}
             </label>
@@ -177,17 +188,6 @@ export default class Player extends Component {
               max={1}
               step={0.01}
             />
-          </div>
-          <div className="col-auto">
-            <label htmlFor="waveType" className="form-label">
-              Type
-            </label>
-            <select className="form-select" onChange={(e) => this.setWaveType(e.target.value)} defaultValue="sine">
-              <option value="sine">Sine (Default)</option>
-              <option value="square">Square</option>
-              <option value="sawtooth">Sawtooth</option>
-              <option value="triangle">Triangle</option>
-            </select>
           </div>
         </div>
       </div>

@@ -16,8 +16,11 @@ export default class App extends Component {
     return (
       <div className="App container">
         <main className="card mb-3">
-          <div className="card-body">
+          <div className="card-body px-2">
             <OpenFile onChangeFile={this.onChangeFile.bind(this)} />
+            <div className="container">
+              <hr />
+            </div>
             <Player sheet={this.state.sheet} />
           </div>
         </main>

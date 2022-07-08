@@ -1,5 +1,28 @@
 import { Component } from "react";
 
+const BASE_PITCH = {
+  C: 0,
+  D: 2,
+  E: 4,
+  F: 5,
+  G: 7,
+  A: 9,
+  B: 11,
+};
+
+function parsePitch(pitch) {
+  let match = /^([#b]*)([CDEFGAB])$/.exec(pitch);
+  if (match) {
+    let modifiers = match[1];
+    return BASE_PITCH[match[2]] + (modifiers.match(/#/g) || []).length - (modifiers.match(/b/g) || []).length;
+  }
+  return parseInt(pitch, 10);
+}
+
+function parseOctave(octave) {
+  return parseInt(octave, 10);
+}
+
 export default class LoadFile extends Component {
   state = {
     mode: "file",
@@ -81,7 +104,7 @@ export default class LoadFile extends Component {
       }
       const [first, ...more] = line.split(/\s*;\s*/);
       const [pitch, octave, tempoM] = first.split(/\s+/);
-      const level = parseInt(pitch) + parseInt(octave) * 12 + 12;
+      const level = parsePitch(pitch) + parseOctave(octave) * 12 + 12;
       const aux = more.map((s) => {
         const [pitch, octave, tempoA, off] = s.split(/\s+/);
         const level = parseInt(pitch) + parseInt(octave) * 12 + 12;

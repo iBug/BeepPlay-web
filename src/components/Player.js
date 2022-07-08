@@ -1,4 +1,13 @@
 import { Component } from "react";
+import Bass from "../vendor/wave-tables/Bass";
+import Piano from "../vendor/wave-tables/Piano";
+
+function makeWaveTable(ctx) {
+  return {
+    bass: ctx.createPeriodicWave(Bass.real, Bass.imag),
+    piano: ctx.createPeriodicWave(Piano.real, Piano.imag),
+  };
+}
 
 export default class Player extends Component {
   constructor(props) {
@@ -7,6 +16,7 @@ export default class Player extends Component {
     this.state = {
       gain: 0.3,
       noteIndex: -1,
+      lastNoteTimestamp: 0,
       sheet: this.props.sheet || defaultSheet,
       waveType: "sine",
     };
@@ -14,12 +24,25 @@ export default class Player extends Component {
     this.auxOscillators = [];
     this.gainNode = this.audioContext.createGain();
     this.setGain(this.state.gain);
+    this.waveTables = makeWaveTable(this.audioContext);
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.sheet !== this.props.sheet) {
       this.setState({ noteIndex: -1, sheet: this.props.sheet });
       this.stop();
+    }
+  }
+
+  getWaveTable(waveType) {
+    switch (waveType) {
+      case "sine":
+      case "square":
+      case "sawtooth":
+      case "triangle":
+        return null;
+      default:
+        return this.waveTables[waveType];
     }
   }
 
@@ -54,20 +77,19 @@ export default class Player extends Component {
     const oscillator = audioCtx.createOscillator();
     this.oscillator = oscillator;
 
-    oscillator.type = this.state.waveType;
+    this.setOscillatorWaveType(oscillator);
     oscillator.frequency.value = frequency;
     oscillator.connect(this.gainNode).connect(audioCtx.destination);
     oscillator.onended = callback;
     if (aux?.length) {
-      const auxOscillators = [];
-      aux.forEach(([frequency, duration, offset]) => {
+      const auxOscillators = aux.map(([frequency, duration, offset]) => {
         const o = audioCtx.createOscillator();
-        o.type = this.state.waveType;
+        this.setOscillatorWaveType(o);
         o.frequency.value = frequency;
         o.connect(this.gainNode).connect(audioCtx.destination);
         o.duration = duration;
         o.offset = offset;
-        auxOscillators.push(o);
+        return o;
       });
       auxOscillators.forEach((o) => {
         if (o.offset) {
@@ -95,10 +117,20 @@ export default class Player extends Component {
     }
   }
 
+  setOscillatorWaveType(o) {
+    const waveType = this.state.waveType;
+    const waveTable = this.getWaveTable(waveType);
+    if (waveTable === null) {
+      o.type = waveType;
+    } else if (waveTable) {
+      o.setPeriodicWave(waveTable);
+    }
+  }
+
   setWaveType(waveType) {
     this.setState({ waveType: waveType });
     if (this.oscillator) {
-      this.oscillator.type = waveType;
+      this.setOscillatorWaveType(this.oscillator);
     }
   }
 
@@ -165,11 +197,13 @@ export default class Player extends Component {
             <label htmlFor="waveType" className="form-label">
               Type
             </label>
-            <select className="form-select" onChange={(e) => this.setWaveType(e.target.value)} defaultValue="sine">
-              <option value="sine">Sine (Default)</option>
+            <select className="form-select" onChange={(e) => this.setWaveType(e.target.value)} defaultValue="bass">
+              <option value="sine">Sine</option>
               <option value="square">Square</option>
               <option value="sawtooth">Sawtooth</option>
               <option value="triangle">Triangle</option>
+              <option value="piano">Piano (Beta)</option>
+              <option value="bass">Bass (Beta)</option>
             </select>
           </div>
           <div className="col-12 col-md-auto flex-grow-1">

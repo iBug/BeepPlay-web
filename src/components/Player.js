@@ -1,10 +1,12 @@
 import { Component } from "react";
 import Bass from "../vendor/wave-tables/Bass";
+import Celeste from "../vendor/wave-tables/Celeste";
 import Piano from "../vendor/wave-tables/Piano";
 
 function makeWaveTable(ctx) {
   return {
     bass: ctx.createPeriodicWave(Bass.real, Bass.imag),
+    celeste: ctx.createPeriodicWave(Celeste.real, Celeste.imag),
     piano: ctx.createPeriodicWave(Piano.real, Piano.imag),
   };
 }
@@ -197,13 +199,14 @@ export default class Player extends Component {
             <label htmlFor="waveType" className="form-label">
               Type
             </label>
-            <select className="form-select" onChange={(e) => this.setWaveType(e.target.value)} defaultValue="bass">
+            <select className="form-select" onChange={(e) => this.setWaveType(e.target.value)} defaultValue="celeste">
               <option value="sine">Sine</option>
               <option value="square">Square</option>
               <option value="sawtooth">Sawtooth</option>
               <option value="triangle">Triangle</option>
               <option value="piano">Piano (Beta)</option>
               <option value="bass">Bass (Beta)</option>
+              <option value="celeste">Celeste (Beta)</option>
             </select>
           </div>
           <div className="col-12 col-md-auto flex-grow-1">

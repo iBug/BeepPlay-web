@@ -8,4 +8,4 @@ const index = {
   default: "Stardew Valley Overture (Chord).txt",
 };
 
-fs.writeFileSync(path.join(BASE, "index.json"), JSON.stringify(index));
+fs.writeFileSync(path.join(BASE, "index.json"), JSON.stringify(index, null, 2));
